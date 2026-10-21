@@ -8,6 +8,41 @@ Toutes les commandes se tapent dans **PowerShell** : menu Démarrer → « Termi
 
 ---
 
+## Étape 0 — Vérifier ce qui est déjà installé
+
+Copiez-collez ce bloc dans PowerShell. Il ne modifie rien.
+```powershell
+foreach ($c in "nvidia-smi","winget","py","python","git","ffmpeg") {
+  $cmd = Get-Command $c -ErrorAction SilentlyContinue
+  if (-not $cmd) { "{0,-11} ABSENT" -f $c }
+  elseif ($c -eq "python" -and $cmd.Source -like "*WindowsApps*") { "{0,-11} ABSENT (raccourci Microsoft Store seulement)" -f $c }
+  else { "{0,-11} OK  {1}" -f $c, $cmd.Source }
+}
+"`n--- GPU / pilote";      nvidia-smi --query-gpu=name,driver_version --format=csv,noheader
+"`n--- Pythons installés"; py -0p
+"`n--- Git";               git --version
+"`n--- FFmpeg";            (ffmpeg -version)[0]
+"`n--- Visual C++";        winget list --name "Visual C++" --accept-source-agreements
+"`n--- Politique de scripts (utilisateur) : " + (Get-ExecutionPolicy -Scope CurrentUser)
+"--- HF_TOKEN : " + $(if ($env:HF_TOKEN) { "défini" } else { "absent" })
+"--- Espace libre sur C: : {0:N0} Go" -f ((Get-PSDrive C).Free / 1GB)
+```
+Des lignes rouges « n'est pas reconnu » sont normales pour un outil absent.
+
+| Résultat | À faire |
+|---|---|
+| `nvidia-smi` OK et pilote **570 ou plus** | Étape 1 inutile. |
+| `py -0p` liste une version **3.12** | Pas besoin d'installer Python à l'étape 2. Les autres versions déjà présentes peuvent rester : `py -3.12` choisit la bonne. |
+| `git` / `ffmpeg` OK | Sautez leur ligne `winget` à l'étape 2. N'importe quelle version récente de FFmpeg convient. |
+| Une ligne `Microsoft Visual C++ 2015-2022 Redistributable (x64)` apparaît | Sautez sa ligne `winget`. |
+| Politique de scripts `RemoteSigned` ou `Unrestricted` | Étape 3 inutile. |
+| `winget` ABSENT | Installez « App Installer » depuis le Microsoft Store. |
+| Moins de **20 Go** libres | Libérez de la place : il faut environ 8 Go de téléchargements, plus les modèles et le cache pip. |
+
+Inutile de vérifier les paquets Python déjà installés (PyTorch, etc.) : l'outil s'installe dans un
+environnement isolé (`.venv`), qui ne voit pas ce qui est installé ailleurs et ne le modifie pas.
+Un « CUDA Toolkit » déjà présent ne gêne pas non plus.
+
 ## Étape 1 — Pilote NVIDIA
 
 1. Mettez à jour le pilote avec l'application **NVIDIA App**, ou depuis https://www.nvidia.com/fr-fr/drivers/.
