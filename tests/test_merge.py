@@ -37,3 +37,13 @@ def test_json_shape():
     data = to_dict([seg], ["Locuteur 1"], {"source": "x.wav"})
     assert data["segments"][0]["words"][0]["word"] == "Bonjour"
     assert data["segments"][0]["speaker"] == "Locuteur 1"
+
+
+def test_nvidia_dll_dirs(tmp_path):
+    from transcripteur.transcribe import nvidia_dll_dirs
+
+    (tmp_path / "nvidia" / "cudnn" / "bin").mkdir(parents=True)
+    (tmp_path / "nvidia" / "cublas" / "bin").mkdir(parents=True)
+    (tmp_path / "nvidia" / "cuda_nvrtc").mkdir(parents=True)  # sans bin/ : ignoré
+    found = nvidia_dll_dirs([str(tmp_path), str(tmp_path / "absent")])
+    assert [d.parent.name for d in found] == ["cublas", "cudnn"]

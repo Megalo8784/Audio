@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import os
+import site
 import sys
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import numpy as np
 
@@ -40,6 +43,8 @@ def transcribe(
     initial_prompt: str | None = None,
 ) -> tuple[list[Segment], dict]:
     """Retourne les segments Whisper et des infos (langue détectée, etc.)."""
+    if sys.platform == "win32" and device == "cuda":
+        register_cuda_dlls()
     from faster_whisper import BatchedInferencePipeline, WhisperModel
 
     model = WhisperModel(model_name, device=device, compute_type=compute_type)
@@ -72,6 +77,23 @@ def transcribe(
         "language": info.language,
         "language_probability": round(info.language_probability, 3),
     }
+
+
+def nvidia_dll_dirs(site_dirs: list[str]) -> list[Path]:
+    """Dossiers bin/ des paquets pip nvidia-* (cuBLAS, cuDNN) présents dans site-packages."""
+    return [d for s in site_dirs for d in sorted(Path(s).glob("nvidia/*/bin")) if d.is_dir()]
+
+
+def register_cuda_dlls() -> None:
+    """Windows : rend les DLL cuBLAS/cuDNN installées par pip visibles pour CTranslate2.
+
+    CTranslate2 n'embarque pas ces DLL sous Windows ; cuDNN charge aussi ses
+    sous-bibliothèques lui-même, d'où l'ajout au PATH en plus de add_dll_directory.
+    """
+    dirs = nvidia_dll_dirs(site.getsitepackages() + [site.getusersitepackages()])
+    for d in dirs:
+        os.add_dll_directory(str(d))
+    os.environ["PATH"] = os.pathsep.join([*map(str, dirs), os.environ.get("PATH", "")])
 
 
 def _progress(label: str, current: float, total: float, done: bool = False) -> None:

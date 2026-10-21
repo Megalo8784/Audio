@@ -13,6 +13,8 @@ La transcription se fait à partir de l'audio d'origine, converti en WAV mono 16
 
 ## Installation (PC avec GPU NVIDIA)
 
+**Windows 11 : suivez le guide pas à pas [docs/INSTALL_WINDOWS.md](docs/INSTALL_WINDOWS.md).**
+
 Prérequis : Python 3.10 à 3.13, [ffmpeg](https://ffmpeg.org/download.html) dans le PATH, pilote NVIDIA récent.
 
 ```bash
@@ -22,8 +24,8 @@ python -m venv .venv
 # 1. PyTorch avec CUDA 12.8+ (obligatoire pour une RTX 50xx / Blackwell)
 pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu128
 
-# 2. L'outil + la diarisation
-pip install -e ".[diarisation]"
+# 2. L'outil + DLL CUDA pour Whisper + la diarisation
+pip install -e ".[cuda,diarisation]"
 ```
 
 Pour la diarisation (gratuite, mais le modèle est « gated ») :

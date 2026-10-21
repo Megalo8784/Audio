@@ -16,6 +16,12 @@ dependencies = [
 
 [project.optional-dependencies]
 diarisation = ["pyannote.audio>=4.0"]
+# DLL CUDA pour faster-whisper sous Windows (CTranslate2 4.x : CUDA 12 + cuDNN 9.10)
+cuda = [
+    "ctranslate2==4.8.3",  # embarque le chargeur cuDNN 9.10.2.21 : versions à garder alignées
+    "nvidia-cublas-cu12==12.8.4.1",
+    "nvidia-cudnn-cu12==9.10.2.21",
+]
 dev = ["pytest"]
 
 [project.scripts]
