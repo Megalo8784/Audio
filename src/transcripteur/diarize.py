@@ -28,6 +28,9 @@ def diarize(
     max_speakers: int | None = None,
 ) -> list[Turn]:
     """Retourne les tours de parole sans chevauchement, triés par début."""
+    # pyannote 4 envoie par défaut des statistiques d'usage (durée des fichiers, nombre de
+    # locuteurs demandé) à otel.pyannote.ai : désactivé sauf choix explicite de l'utilisateur.
+    os.environ.setdefault("PYANNOTE_METRICS_ENABLED", "false")
     try:
         import torch
         from pyannote.audio import Pipeline

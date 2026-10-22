@@ -178,6 +178,22 @@ Avertissements **sans importance**, que vous pouvez ignorer :
 
 ---
 
+## Confidentialité : ce qui sort de la machine
+
+- **L'audio et le texte ne quittent jamais le PC.** Tout le calcul est local.
+- **À chaque lancement**, faster-whisper et pyannote contactent huggingface.co pour vérifier si le
+  modèle en cache est à jour. Ces requêtes transmettent l'adresse IP, les versions des bibliothèques
+  et, pour pyannote, le jeton `HF_TOKEN`. Elles ne contiennent aucune donnée audio.
+- **Statistiques d'usage de pyannote** : envoyées par défaut à `otel.pyannote.ai` (durée du fichier,
+  nombre de locuteurs demandé). L'outil les **désactive** (`PYANNOTE_METRICS_ENABLED=false`).
+
+Pour couper **tout** accès réseau une fois les modèles téléchargés (après l'étape 10) :
+```powershell
+setx HF_HUB_OFFLINE 1
+```
+Rouvrez ensuite le Terminal. Pour annuler (mise à jour des modèles, changement de modèle) :
+`setx HF_HUB_OFFLINE 0`.
+
 ## Utilisation au quotidien
 
 ```powershell
