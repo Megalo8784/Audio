@@ -47,3 +47,13 @@ def test_nvidia_dll_dirs(tmp_path):
     (tmp_path / "nvidia" / "cuda_nvrtc").mkdir(parents=True)  # sans bin/ : ignoré
     found = nvidia_dll_dirs([str(tmp_path), str(tmp_path / "absent")])
     assert [d.parent.name for d in found] == ["cublas", "cudnn"]
+
+
+def test_cli_fails_fast_without_hf_token(monkeypatch, tmp_path, capsys):
+    from transcripteur import cli
+
+    monkeypatch.delenv("HF_TOKEN", raising=False)
+    monkeypatch.setattr(cli, "process", lambda *a: (_ for _ in ()).throw(AssertionError("lancé")))
+    (tmp_path / "a.wav").write_bytes(b"")
+    assert cli.main([str(tmp_path / "a.wav")]) == 1
+    assert "HF_TOKEN" in capsys.readouterr().err

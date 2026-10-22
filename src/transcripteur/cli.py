@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import gc
+import os
 import sys
 import tempfile
 import time
@@ -129,6 +130,11 @@ def process(src: Path, out_dir: Path, args: argparse.Namespace) -> Path:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if not args.sans_locuteurs and not (args.hf_token or os.environ.get("HF_TOKEN")):
+        # Vérifié avant la transcription, qui peut durer longtemps sur un fichier de plusieurs heures.
+        print("Jeton Hugging Face manquant (variable HF_TOKEN ou --hf-token), nécessaire pour "
+              "identifier les locuteurs. Sinon : --sans-locuteurs.", file=sys.stderr)
+        return 1
     files = collect(args.entrees)
     if not files:
         print("Aucun fichier audio à traiter.", file=sys.stderr)
