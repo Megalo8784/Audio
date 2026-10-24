@@ -57,3 +57,12 @@ def test_cli_fails_fast_without_hf_token(monkeypatch, tmp_path, capsys):
     (tmp_path / "a.wav").write_bytes(b"")
     assert cli.main([str(tmp_path / "a.wav")]) == 1
     assert "HF_TOKEN" in capsys.readouterr().err
+
+
+def test_txt_has_only_timestamps_and_text():
+    from transcripteur.output import to_txt
+
+    segs = [Segment(3.4, 7.9, "Bonjour.", [], "Locuteur 1"),
+            Segment(8.0, 9.0, "", []),
+            Segment(3725.0, 3727.5, "Au revoir.", [], "Locuteur 2")]
+    assert to_txt(segs) == "[00:00:03 - 00:00:07] Bonjour.\n[01:02:05 - 01:02:07] Au revoir.\n"

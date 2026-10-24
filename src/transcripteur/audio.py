@@ -17,6 +17,7 @@ COMPRESSION = {
     "opus": (".opus", ["-c:a", "libopus", "-b:a", "24k", "-application", "voip"]),
     "mp3": (".mp3", ["-c:a", "libmp3lame", "-b:a", "64k"]),
 }
+COMPRESSED_SUFFIXES = {ext for ext, _ in COMPRESSION.values()}
 
 
 class AudioError(RuntimeError):

@@ -1,4 +1,4 @@
-"""Écriture du résultat en JSON."""
+"""Écriture du résultat en JSON et en texte brut."""
 
 from __future__ import annotations
 
@@ -34,7 +34,21 @@ def to_dict(segments: list[Segment], speakers: list[str], metadata: dict) -> dic
     }
 
 
-def write_json(data: dict, path: Path) -> None:
+def _hms(seconds: float) -> str:
+    s = int(seconds)
+    return f"{s // 3600:02d}:{s % 3600 // 60:02d}:{s % 60:02d}"
+
+
+def to_txt(segments: list[Segment]) -> str:
+    """Une ligne par segment : « [début - fin] texte »."""
+    return "".join(f"[{_hms(s.start)} - {_hms(s.end)}] {s.text}\n" for s in segments if s.text)
+
+
+def write_text(text: str, path: Path) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.write_text(text, encoding="utf-8")
     tmp.replace(path)
+
+
+def write_json(data: dict, path: Path) -> None:
+    write_text(json.dumps(data, ensure_ascii=False, indent=2), path)

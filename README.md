@@ -6,7 +6,10 @@ Outil en ligne de commande, 100 % local, qui :
 2. produit une copie **compressée mono** (mp3 64 kbit/s par défaut, ou opus 24 kbit/s) pour l'archivage ;
 3. transcrit en français avec **faster-whisper** (horodatage au mot) ;
 4. identifie les locuteurs avec **pyannote.audio** (de 2 à N, détectés automatiquement) ;
-5. écrit un **JSON** à côté du fichier source.
+5. écrit un **JSON** (détaillé, mot à mot) et un **TXT** (une ligne `[début - fin] texte` par
+   segment) à côté du fichier source ;
+6. si un enregistrement ne contient **aucune parole**, déplace l'audio, sa copie compressée, le JSON
+   et le TXT dans un sous-dossier `a_supprimer/` (désactivable avec `--garder-silencieux`).
 
 La transcription se fait à partir de l'audio d'origine, converti en WAV mono 16 kHz temporaire, et
 **pas** à partir du MP3. La copie compressée sert uniquement à manipuler des fichiers plus légers.
@@ -50,6 +53,11 @@ transcrire --help
 ```
 
 Les fichiers déjà transcrits (JSON présent) sont ignorés. `--ecraser` les refait.
+Avec un dossier, seuls les fichiers directement dedans sont traités (pas les sous-dossiers), et une
+copie compressée `appel.mp3` à côté de `appel.wav` n'est pas retranscrite.
+
+« Aucune parole » signifie que Whisper n'a produit aucun texte (les silences sont filtrés en amont).
+Les fichiers sont **déplacés, jamais supprimés** : vérifiez `a_supprimer/` avant de le vider.
 
 ## Format JSON
 
