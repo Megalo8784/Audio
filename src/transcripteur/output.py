@@ -40,8 +40,11 @@ def _hms(seconds: float) -> str:
 
 
 def to_txt(segments: list[Segment]) -> str:
-    """Une ligne par segment : « [début - fin] texte »."""
-    return "".join(f"[{_hms(s.start)} - {_hms(s.end)}] {s.text}\n" for s in segments if s.text)
+    """Une ligne par segment : « [début - fin] Locuteur N : texte » (locuteur omis s'il est inconnu)."""
+    return "".join(
+        f"[{_hms(s.start)} - {_hms(s.end)}] {s.speaker + ' : ' if s.speaker else ''}{s.text}\n"
+        for s in segments if s.text
+    )
 
 
 def write_text(text: str, path: Path) -> None:

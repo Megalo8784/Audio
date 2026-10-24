@@ -6,8 +6,8 @@ Outil en ligne de commande, 100 % local, qui :
 2. produit une copie **compressée mono** (mp3 64 kbit/s par défaut, ou opus 24 kbit/s) pour l'archivage ;
 3. transcrit en français avec **faster-whisper** (horodatage au mot) ;
 4. identifie les locuteurs avec **pyannote.audio** (de 2 à N, détectés automatiquement) ;
-5. écrit un **JSON** (détaillé, mot à mot) et un **TXT** (une ligne `[début - fin] texte` par
-   segment) à côté du fichier source ;
+5. écrit un **JSON** (détaillé, mot à mot) et un **TXT** (une ligne `[début - fin] Locuteur N : texte`
+   par segment) à côté du fichier source ;
 6. si un enregistrement ne contient **aucune parole**, déplace l'audio, sa copie compressée, le JSON
    et le TXT dans un sous-dossier `a_supprimer/` (désactivable avec `--garder-silencieux`).
 
